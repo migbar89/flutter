@@ -7,14 +7,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
  GlobalKey<FormState> keyForm = new GlobalKey();
  TextEditingController  nameCtrl = new TextEditingController();
-final databaseReference = Firestore.instance;
- TextEditingController  ApellidoCtrl = new TextEditingController();
+ TextEditingController  apellidoCtrl = new TextEditingController();
  TextEditingController  emailCtrl = new TextEditingController();
  TextEditingController  mobileCtrl = new TextEditingController();
  TextEditingController  passwordCtrl = new TextEditingController();
  TextEditingController  repeatPassCtrl = new TextEditingController();
 
  String gender = 'hombre';
+
+ var fs = Firestore.instance; // Instancia de firestore global
 
 void add_cliente(BuildContext context) {
   Navigator.push(context, MaterialPageRoute(
@@ -38,12 +39,15 @@ void add_cliente(BuildContext context) {
 }
 
 void createRecord() async {
-  Firestore.instance.runTransaction((transaction) async {
-    await transaction.set(Firestore.instance.collection("your_collection").document(), {
-      'replyName': "nombre",
-      'replyText': "apellido",
-      'replyVotes': "Telefono",
-    });
+  await fs.collection("your_collection").document().setData({
+    'replyName': nameCtrl.text,
+    'replyText': apellidoCtrl.text,
+    'replyVotes': int.parse(mobileCtrl.text),
+    'genre': gender
+  }).then((value){
+    print("Documento agregado a la base de datos");
+  }).catchError((e) {
+    print("Error" + e.toString());
   });
 }
 setvalue(String value)
@@ -91,7 +95,7 @@ return  Column(
             formItemsDesign(
            Icons.person,
            TextFormField(
-             controller: ApellidoCtrl,
+             controller: apellidoCtrl,
              decoration: new InputDecoration(
                labelText: 'Apellido',
              ),
@@ -126,7 +130,7 @@ return  Column(
                value: 'mujer',
                groupValue: gender,
                onChanged: (value) {
-                 
+
                  setState(() {
                    gender = value;
                  });
