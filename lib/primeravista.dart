@@ -44,7 +44,7 @@ void openPage(BuildContext context) {
   ));
 }
 
-
+/*
 class MyStatelessWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -70,10 +70,10 @@ class MyStatelessWidget extends StatelessWidget {
   }
 }
 
-
+ */
 
 /// This is the stateless widget that the main application instantiates.
-/*
+
 class MyStatelessWidget extends StatelessWidget {
   MyStatelessWidget({Key key}) : super(key: key);
 
@@ -103,14 +103,13 @@ class MyStatelessWidget extends StatelessWidget {
           ],
         ),
 
-        body:
-        )
+       // body: new ListView(children:clientes.map(_item_listview).toList(),
         )
     );
   }
 }
 
-*/
+
 getExpenseItems(AsyncSnapshot<QuerySnapshot> snapshot) {
   return snapshot.data.documents
       .map((doc) => new ListTile(title: new Text(doc["nombre"]), subtitle: new Text(doc["apellido"].toString())))
