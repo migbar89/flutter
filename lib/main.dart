@@ -45,35 +45,10 @@ void openPage(BuildContext context) {
 }
 
 
-class MyStatelessWidget extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return StreamBuilder<QuerySnapshot>(
-      stream: Firestore.instance.collection('gym').snapshots(),
-      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-        if (snapshot.hasError)
-          return new Text('Error: ${snapshot.error}');
-        switch (snapshot.connectionState) {
-          case ConnectionState.waiting: return new Text('Loading...');
-          default:
-            return new ListView(
-              children: snapshot.data.documents.map((DocumentSnapshot document) {
-                return new ListTile(
-                  title: new Text(document['nombre']),
-                  subtitle: new Text(document['apellido']),
-                );
-              }).toList(),
-            );
-        }
-      },
-    );
-  }
-}
-
 
 
 /// This is the stateless widget that the main application instantiates.
-/*
+
 class MyStatelessWidget extends StatelessWidget {
   MyStatelessWidget({Key key}) : super(key: key);
 
@@ -103,27 +78,51 @@ class MyStatelessWidget extends StatelessWidget {
           ],
         ),
 
-        body:
-        )
-        )
+       body:mybody() //new ListView(children:clientes.map(_item_listview).toList(),
+    );
+
+  }
+}
+
+class mybody extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<QuerySnapshot>(
+      stream: Firestore.instance.collection('gym').snapshots(),
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (snapshot.hasError)
+          return new Text('Error: ${snapshot.error}');
+        switch (snapshot.connectionState) {
+          case ConnectionState.waiting: return new Text('Loading...');
+          default:
+            return new ListView(
+              children: snapshot.data.documents.map((DocumentSnapshot document) {
+                return new Material(
+                    child: _item_listview(document['nombre'], document['apellido'])
+
+                );
+              }).toList(),
+            );
+        }
+      },
     );
   }
 }
 
-*/
+
 getExpenseItems(AsyncSnapshot<QuerySnapshot> snapshot) {
   return snapshot.data.documents
       .map((doc) => new ListTile(title: new Text(doc["nombre"]), subtitle: new Text(doc["apellido"].toString())))
       .toList();
 }
 
-Widget _item_listview(Client textTitle) {
+Widget _item_listview(String nombre,String apellido) {
   return new ListTile(
-    title: new Text(textTitle.nombre),
-    subtitle: new Text(textTitle.apellido),
-    leading: new Icon(Icons.map),
+    title: new Text(nombre),
+    subtitle: new Text(apellido),
+    leading: new Icon(Icons.people),
     onTap: (){
-      _tappedFolder(textTitle.nombre);
+      _tappedFolder(nombre);
     },
   );
 }
