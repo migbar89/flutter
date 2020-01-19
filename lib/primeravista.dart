@@ -22,7 +22,6 @@ class MyApp extends StatelessWidget {
   }
 }
 
-
 final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 final SnackBar snackBar = const SnackBar(content: Text('Showing Snackbar'));
 
@@ -44,34 +43,6 @@ void openPage(BuildContext context) {
   ));
 }
 
-/*
-class MyStatelessWidget extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return StreamBuilder<QuerySnapshot>(
-      stream: Firestore.instance.collection('gym').snapshots(),
-      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-        if (snapshot.hasError)
-          return new Text('Error: ${snapshot.error}');
-        switch (snapshot.connectionState) {
-          case ConnectionState.waiting: return new Text('Loading...');
-          default:
-            return new ListView(
-              children: snapshot.data.documents.map((DocumentSnapshot document) {
-                return new ListTile(
-                  title: new Text(document['nombre']),
-                  subtitle: new Text(document['apellido']),
-                );
-              }).toList(),
-            );
-        }
-      },
-    );
-  }
-}
-
- */
-
 /// This is the stateless widget that the main application instantiates.
 
 class MyStatelessWidget extends StatelessWidget {
@@ -80,39 +51,38 @@ class MyStatelessWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        key: scaffoldKey,
-        appBar: AppBar(
-          title: const Text('Gym Control'),
-          actions: <Widget>[
-            IconButton(
-              icon: const Icon(Icons.person_add),
-              tooltip: 'Show Snackbar',
-              onPressed: () {
-                // scaffoldKey.currentState.showSnackBar(snackBar);
-                add_cliente(context);
+      key: scaffoldKey,
+      appBar: AppBar(
+        title: const Text('Gym Control'),
+        actions: <Widget>[
+          IconButton(
+            icon: const Icon(Icons.person_add),
+            tooltip: 'Show Snackbar',
+            onPressed: () {
+              // scaffoldKey.currentState.showSnackBar(snackBar);
+              add_cliente(context);
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.navigate_next),
+            tooltip: 'Next page',
+            onPressed: () {
+              openPage(context);
+            },
+          ),
+        ],
+      ),
 
-              },
-            ),
-            IconButton(
-              icon: const Icon(Icons.navigate_next),
-              tooltip: 'Next page',
-              onPressed: () {
-                openPage(context);
-              },
-            ),
-          ],
-        ),
-
-       // body: new ListView(children:clientes.map(_item_listview).toList(),
-        )
+      // body: new ListView(children:clientes.map(_item_listview).toList(),
     );
   }
 }
 
-
 getExpenseItems(AsyncSnapshot<QuerySnapshot> snapshot) {
   return snapshot.data.documents
-      .map((doc) => new ListTile(title: new Text(doc["nombre"]), subtitle: new Text(doc["apellido"].toString())))
+      .map((doc) => new ListTile(
+          title: new Text(doc["nombre"]),
+          subtitle: new Text(doc["apellido"].toString())))
       .toList();
 }
 
@@ -121,7 +91,7 @@ Widget _item_listview(Client textTitle) {
     title: new Text(textTitle.nombre),
     subtitle: new Text(textTitle.apellido),
     leading: new Icon(Icons.map),
-    onTap: (){
+    onTap: () {
       _tappedFolder(textTitle.nombre);
     },
   );
