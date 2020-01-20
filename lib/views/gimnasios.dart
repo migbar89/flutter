@@ -6,6 +6,8 @@ import 'package:flutter_app_gymapp/classes/Gimnasio.dart';
 import 'dart:async';
 
 class GimnasiosView extends StatefulWidget {
+  GimnasiosView({Key key}) : super(key: key);
+
   @override
   _GimnasiosViewState createState() => _GimnasiosViewState();
 }
