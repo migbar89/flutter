@@ -38,14 +38,20 @@ void add_cliente(BuildContext context) {
 }
 
 void createRecord() async {
-  await fs.collection("gym").document().setData({
+  await fs.collection("gym").add({
     'nombre': nameCtrl.text,
     'apellido': apellidoCtrl.text,
     'telefono': mobileCtrl.text,
     'genre': gender,
-    'direccion':ctdireccion.text
-  }).then((value) {
-    print("Documento agregado a la base de datos");
+    'direccion': ctdireccion.text,
+  }).then((documento) async {
+    await fs.document('gym/${documento.documentID}').updateData({
+      'ID': documento.documentID,
+    }).then((valor) {
+      print("Documento agregado a la base de datos");
+    }).catchError((er) {
+      print(er.toString());
+    });
   }).catchError((e) {
     print("Error" + e.toString());
   });
@@ -148,7 +154,6 @@ Widget formUI(BuildContext context) {
             maxLength: 32,
             validator: validateEmail,
           )),
-
       RaisedButton(
         child: Text('Create Record'),
         onPressed: () {
