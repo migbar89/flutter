@@ -60,7 +60,7 @@ class MyStatelessWidget extends StatelessWidget {
             tooltip: 'Show Snackbar',
             onPressed: () {
               // scaffoldKey.currentState.showSnackBar(snackBar);
-              add_cliente(context);
+              AgregarClienteView();
             },
           ),
           IconButton(

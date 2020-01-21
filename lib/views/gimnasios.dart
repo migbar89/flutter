@@ -15,12 +15,11 @@ class GimnasiosView extends StatefulWidget {
 class _GimnasiosViewState extends State<GimnasiosView> {
   List<Gimnasio> gimnasios;
   Firestore fs = Firestore.instance;
-  final CollectionReference gimnasiosRef = Firestore.instance.collection('gym');
 
   StreamSubscription<QuerySnapshot> gimnasiosSub;
 
   Stream<QuerySnapshot> getListaGimnasios({int offset, int limit}) {
-    Stream<QuerySnapshot> snapshots = this.gimnasiosRef.snapshots();
+    Stream<QuerySnapshot> snapshots = this.fs.collection('gym').snapshots();
 
     if (offset != null) {
       snapshots = snapshots.skip(offset);
@@ -37,6 +36,7 @@ class _GimnasiosViewState extends State<GimnasiosView> {
   void initState() {
     // TODO: implement initState
     super.initState();
+
     this.gimnasios = new List();
 
     gimnasiosSub = this.getListaGimnasios().listen((QuerySnapshot snapshot) {
@@ -65,7 +65,12 @@ class _GimnasiosViewState extends State<GimnasiosView> {
           IconButton(
             icon: Icon(Icons.person_add),
             onPressed: () {
-              add_cliente(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AgregarClienteView(),
+                ),
+              );
             },
           )
         ],
