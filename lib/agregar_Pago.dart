@@ -27,6 +27,11 @@ void add_Pago(BuildContext context) {
         appBar: AppBar(
           title: const Text('Agregando Pago'),
         ),
+
+
+
+
+
         body: new SingleChildScrollView(
           child: new Container(
             margin: new EdgeInsets.all(60.0),
