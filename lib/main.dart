@@ -1,10 +1,14 @@
+
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_app_gymapp/agregar_cliente.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_app_gymapp/verinformacion.dart';
 
 //import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'clientes.dart';
+import 'datospublicos.dart';
 
 void main() => runApp(MyApp());
 //void main() => runApp(MyStatelessWidget());
@@ -62,7 +66,8 @@ class MyStatelessWidget extends StatelessWidget {
             IconButton(
               icon: const Icon(Icons.person_add),
               tooltip: 'Show Snackbar',
-              onPressed: () {
+              onPressed: ()
+              {
                 // scaffoldKey.currentState.showSnackBar(snackBar);
                 add_cliente(context);
 
@@ -98,7 +103,7 @@ class mybody extends StatelessWidget {
             return new ListView(
               children: snapshot.data.documents.map((DocumentSnapshot document) {
                 return new Material(
-                    child: _item_listview(document['nombre'], document['apellido'])
+                    child: _item_listview(document['nombre'], document['apellido'],document.documentID,context)
 
                 );
               }).toList(),
@@ -116,17 +121,21 @@ getExpenseItems(AsyncSnapshot<QuerySnapshot> snapshot) {
       .toList();
 }
 
-Widget _item_listview(String nombre,String apellido) {
+Widget _item_listview(String nombre,String apellido,String id,BuildContext context) {
   return new ListTile(
     title: new Text(nombre),
     subtitle: new Text(apellido),
     leading: new Icon(Icons.people),
     onTap: (){
-      _tappedFolder(nombre);
+      _tappedFolder(id);
+      ver_informacion(context);
+      idclienteselect=id;
+      nombrecliente=nombre;
+     // getnombre();
     },
   );
 }
 
 void _tappedFolder(String which) {
-  print("tapped");
+  print(which);
 }

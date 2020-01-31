@@ -1,0 +1,29 @@
+[33mcommit a637ab6ed07decbf140d0f8a2bddda9476d5f84b[m[33m ([m[1;36mHEAD -> [m[1;32mmaster[m[33m)[m
+Author: Miguel <miguel.lezama89@gmail.com>
+Date:   Sun Jan 19 18:21:35 2020 -0600
+
+    Probando codigo edycar
+
+[33mcommit 4744b6974ef6d6e33c9e9f38022c8a73d3427aca[m[33m ([m[1;31morigin/master[m[33m)[m
+Author: Miguel <miguel.lezama89@gmail.com>
+Date:   Sun Jan 19 16:30:28 2020 -0600
+
+    coneccion con firestore terminada
+
+[33mcommit f5a2bf1a9e3cef1595de2f782a5cabb389111c5d[m
+Author: Miguel <miguel.lezama89@gmail.com>
+Date:   Sat Jan 18 23:13:35 2020 -0600
+
+    Segundo Commit
+
+[33mcommit 8b3feb8fcd94c9c8e36ae516e0b777ab5fcd193c[m
+Author: Edycar Reyes <edycarreyes@gmail.com>
+Date:   Sat Jan 18 12:00:05 2020 -0600
+
+    Firestore push to database issues fixed
+
+[33mcommit bc9053bdbac30a10baebaab850908fc5118eeefe[m
+Author: Miguel <miguel.lezama89@gmail.com>
+Date:   Sat Jan 18 10:33:02 2020 -0600
+
+    Primer commit
