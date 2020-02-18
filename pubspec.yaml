@@ -22,6 +22,8 @@ dependencies:
   firebase_core: ^0.4.3+2 # add this line
   cloud_firestore: ^0.13.0+1 # add this line
   datetime_picker_formfield: ^1.0.0
+  grouped_buttons: ^1.0.4
+  material_search: ^0.2.8
 
 
 

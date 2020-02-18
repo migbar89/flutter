@@ -1,111 +1,145 @@
 
 
+
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter_app_gymapp/agregar_cliente.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app_gymapp/verinformacion.dart';
 
-//import 'package:cloud_firestore/cloud_firestore.dart';
-
-import 'clientes.dart';
 import 'datospublicos.dart';
 
+final TextEditingController _searchField = new TextEditingController();
+
+bool text_search=false;
+
 void main() => runApp(MyApp());
-//void main() => runApp(MyStatelessWidget());
 
-/// This Widget is the main application widget.
 class MyApp extends StatelessWidget {
-  static const String _title = 'Flutter Code Sample';
-
+  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: _title,
-      home: MyStatelessWidget(),
+      title: 'Flutter Demo',
+      theme: ThemeData(
+
+        primarySwatch: Colors.pink,
+      ),
+      home: SearchBar(),
     );
   }
 }
 
+class SearchBar extends StatefulWidget{
+  @override
+  State createState() {
+    // TODO: implement createState
+    return SearchBarState();
+  }
 
-final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
-final SnackBar snackBar = const SnackBar(content: Text('Showing Snackbar'));
+}
 
-void openPage(BuildContext context) {
-  Navigator.push(context, MaterialPageRoute(
-    builder: (BuildContext context) {
-      return Scaffold(
-        appBar: AppBar(
-          title: const Text('Next page1'),
-        ),
-        body: const Center(
-          child: Text(
-            'This is the next page',
-            style: TextStyle(fontSize: 24),
+class SearchBarState extends State
+{
+  bool issearch=false;
+  
+  SearchBarState(){
+    _searchField.addListener((){
+      if(_searchField.text.isNotEmpty)
+        {
+          setState(() {
+            issearch=true;
+            text_search=true;
+
+           // issearch=false;
+
+          });
+        }
+      else
+        {
+          setState(() {
+            text_search=true;
+           // issearch=true;
+          });
+        }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    return MaterialApp(
+      home: Scaffold(
+          appBar: AppBar(
+            backgroundColor: Colors.pink,
+            title: !issearch? Text("Gym App"):
+            TextField(decoration: InputDecoration(
+              icon: Icon(Icons.search,color: Colors.white),
+              hintText: "Buscando Cliente",
+              hintStyle: TextStyle(color: Colors.white),
+
+
+
+            ),
+             autofocus: true,
+
+              controller: _searchField,
+              style: TextStyle(color: Colors.white),
+            ),
+            actions: <Widget>[
+              this.issearch?
+              IconButton(
+                icon: Icon(Icons.cancel),
+                onPressed: (){
+                  setState(() {
+                    this.issearch=!this.issearch;
+                    text_search=false;
+
+
+                  });
+
+                },
+              ):
+              IconButton(
+                icon: Icon(Icons.search),
+                onPressed: (){
+                  setState(() {
+                    this.issearch=!this.issearch;
+                    text_search=false;
+                  });
+
+                },
+              )
+            ],
+
           ),
-        ),
-      );
-    },
-  ));
-}
+          body:
+             issearch ? (text_search? busqueda():datoscompletos() ): datoscompletos()
 
-
-
-
-/// This is the stateless widget that the main application instantiates.
-
-class MyStatelessWidget extends StatelessWidget {
-  MyStatelessWidget({Key key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        key: scaffoldKey,
-        appBar: AppBar(
-          title: const Text('Gym Control'),
-          actions: <Widget>[
-            IconButton(
-              icon: const Icon(Icons.person_add),
-              tooltip: 'Show Snackbar',
-              onPressed: ()
-              {
-                // scaffoldKey.currentState.showSnackBar(snackBar);
-                add_cliente(context);
-
-              },
-            ),
-            IconButton(
-              icon: const Icon(Icons.navigate_next),
-              tooltip: 'Next page',
-              onPressed: () {
-                openPage(context);
-              },
-            ),
-          ],
-        ),
-
-       body:mybody() //new ListView(children:clientes.map(_item_listview).toList(),
+      ),
     );
-
   }
-}
 
-class mybody extends StatelessWidget {
+}
+class busqueda extends StatelessWidget {
+
+
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<QuerySnapshot>(
-      stream: Firestore.instance.collection('gym').snapshots(),
+
+    return   StreamBuilder<QuerySnapshot>(
+      stream: Firestore.instance.collection('gym').where('nombre',isGreaterThanOrEqualTo:_searchField.text)
+          .where('nombre',isLessThan: _searchField.text + 'z').snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-        if (snapshot.hasError)
-          return new Text('Error: ${snapshot.error}');
+        if (snapshot.hasError) return new Text('Error: ${snapshot.error}');
         switch (snapshot.connectionState) {
-          case ConnectionState.waiting: return new Text('Loading...');
+          case ConnectionState.waiting:
+            return new Text('Loading...');
           default:
             return new ListView(
-              children: snapshot.data.documents.map((DocumentSnapshot document) {
+              children:
+              snapshot.data.documents.map((DocumentSnapshot document) {
                 return new Material(
-                    child: _item_listview(document['nombre'], document['apellido'],document.documentID,context)
-
-                );
+                    child: _item_listview(document['nombre'],
+                        document['apellido'], document.documentID, context));
               }).toList(),
             );
         }
@@ -114,28 +148,55 @@ class mybody extends StatelessWidget {
   }
 }
 
+class datoscompletos extends StatelessWidget {
 
-getExpenseItems(AsyncSnapshot<QuerySnapshot> snapshot) {
-  return snapshot.data.documents
-      .map((doc) => new ListTile(title: new Text(doc["nombre"]), subtitle: new Text(doc["apellido"].toString())))
-      .toList();
+
+  @override
+  Widget build(BuildContext context) {
+    return   StreamBuilder<QuerySnapshot>(
+      stream: Firestore.instance.collection('gym').snapshots(),
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (snapshot.hasError) return new Text('Error: ${snapshot.error}');
+        switch (snapshot.connectionState) {
+          case ConnectionState.waiting:
+            return new Text('Loading...');
+          default:
+            return new ListView(
+              children:
+              snapshot.data.documents.map((DocumentSnapshot document) {
+                return new Material(
+                    child: _item_listview(document['nombre'],
+                        document['apellido'], document.documentID, context));
+              }).toList(),
+            );
+        }
+      },
+    );
+  }
 }
 
-Widget _item_listview(String nombre,String apellido,String id,BuildContext context) {
+Widget _item_listview(String nombre, String apellido, String id,
+    BuildContext context) {
   return new ListTile(
-    title: new Text(nombre),
-    subtitle: new Text(apellido),
+    title: new Text(nombre,
+        style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+            color: Color(0xff5A8CD8))),
+    subtitle: new Text(apellido,
+        style: TextStyle(fontSize: 16, color: Color(0xff09090A))),
     leading: new Icon(Icons.people),
-    onTap: (){
+    onTap: () {
       _tappedFolder(id);
+      idclienteselect = id;
+      nombrecliente = nombre;
+      //ver_informacion(context);
       ver_informacion(context);
-      idclienteselect=id;
-      nombrecliente=nombre;
-     // getnombre();
+
+      // getnombre();
     },
   );
 }
-
 void _tappedFolder(String which) {
   print(which);
 }

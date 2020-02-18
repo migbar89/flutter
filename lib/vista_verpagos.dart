@@ -1,39 +1,40 @@
-
-import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-
-
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter_app_gymapp/agregar_Pago.dart';
-import 'package:flutter_app_gymapp/datospublicos.dart';
+import 'package:flutter/material.dart';
 
-void ver_informacion(BuildContext context) {
-  Navigator.push(context, MaterialPageRoute(
-    builder: (BuildContext context) {
-      return Scaffold(
+import 'agregar_Pago.dart';
+import 'datospublicos.dart';
+
+class vista_verpagos extends StatelessWidget {
+  vista_verpagos(BuildContext context);
+
+
+
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
         appBar: AppBar(
-          title: const Text('Informacion'),
+            title: const Text('Informacion'),
             actions: <Widget>[
-          IconButton(
-              icon: const Icon(Icons.monetization_on),
-              tooltip: 'Agregar Pago',
-              onPressed: ()
-              {
+              IconButton(
+                icon: const Icon(Icons.monetization_on),
+                tooltip: 'Agregar Pago',
+                onPressed: ()
+                {
                   // scaffoldKey.currentState.showSnackBar(snackBar);
-                   add_Pago(context);
+                  add_Pago(context);
 
-             },
-            ),]
+                },
+              ),]
         ),
         body: vista_verinformacion(context)
-      );
-    },
-  ));
+    );
+  }
 }
 
 Widget vista_verinformacion(BuildContext context)
 {
-  
+
   return Column(
       children: <Widget>[
         Padding(
@@ -52,8 +53,8 @@ Widget vista_verinformacion(BuildContext context)
               case ConnectionState.waiting: return new Text('Loading...');
               default:
                 return new ListView(
-                    scrollDirection: Axis.vertical,
-                    shrinkWrap: true,
+                  scrollDirection: Axis.vertical,
+                  shrinkWrap: true,
                   children: snapshot.data.documents.map((DocumentSnapshot document) {
                     return new Material(
                         child: _item_listview_pagos(document['monto'], document['fecha'],document.documentID,context)
@@ -71,21 +72,16 @@ Widget vista_verinformacion(BuildContext context)
 
   );
 }
-Widget _item_listview_pagos(int monto,Timestamp fecha,String id,BuildContext context) {
-  DateTime f=fecha.toDate();
-  var formatter = new DateFormat('dd MMM yyyy');
-  String formatted = formatter.format(f);
-
+Widget _item_listview_pagos(int monto,String fecha,String id,BuildContext context) {
   return new ListTile(
     title:  new Text(monto.toString(),style: TextStyle(fontWeight: FontWeight.bold,fontSize: 16),),
-    subtitle: new Text(formatted.toString(),style: TextStyle(fontWeight: FontWeight.bold,fontSize: 14),),
-
+    subtitle: new Text(fecha,style: TextStyle(fontWeight: FontWeight.bold,fontSize: 14),),
 
     leading: new Icon(Icons.monetization_on),
     onTap: (){
 
       //ver_informacion(context);
-     // idclienteselect=id;
+      // idclienteselect=id;
       //nombrecliente=nombre;
       // getnombre();
     },

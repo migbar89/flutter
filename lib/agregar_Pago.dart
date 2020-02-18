@@ -1,5 +1,8 @@
+
+
 import 'package:flutter/material.dart';
 import 'package:flutter_app_gymapp/agregar_cliente.dart';
+import 'package:grouped_buttons/grouped_buttons.dart';
 import 'package:intl/intl.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -8,17 +11,20 @@ import 'package:flutter_app_gymapp/datospublicos.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 
 GlobalKey<FormState> keyForm = new GlobalKey();
+
 TextEditingController montoCtrl = new TextEditingController();
 TextEditingController fechaCtrl = new TextEditingController();
 final DateTime selectedDate=new DateTime.now();
 
 String tipopago = 'Mensual';
+DateTime fecha_pago=null;DateTime fecha_vence=null;
 
 TextEditingController fecha_vencimientoCtrl = new TextEditingController();
 
 
 var fs = Firestore.instance; // Instancia de firestore global
-final format = DateFormat("dd-MM-yyyy");
+final format = DateFormat("dd/MM/yyyy");
+
 
 void add_Pago(BuildContext context) {
   Navigator.push(context, MaterialPageRoute(
@@ -27,9 +33,6 @@ void add_Pago(BuildContext context) {
         appBar: AppBar(
           title: const Text('Agregando Pago'),
         ),
-
-
-
 
 
         body: new SingleChildScrollView(
@@ -49,7 +52,10 @@ void add_Pago(BuildContext context) {
 void createRecord() async {
   await fs.collection("gym").document(idclienteselect).collection("Pagos").document().setData({
     'monto': int.parse( montoCtrl.text),
-    'fecha': fechaCtrl.text,
+    'fecha': fecha_pago,
+    'fecha_vencimiento': fecha_vence,
+    'forma_pago': tipopago,
+
 
   }).then((value) {
     print("Documento agregado a la base de datos");
@@ -64,15 +70,44 @@ formItemsDesign(icon, item) {
     child: Card(child: ListTile(leading: Icon(icon), title: item)),
   );
 }
-obtenerfechavencimiento()
-{
-  DateTime fechaven=DateTime.parse(fechaCtrl.text);
-  fechaven=fechaven.add(new Duration(days: 30));
- fecha_vencimientoCtrl.text=fechaven.toString();
-}
+
 
 setvalue_pago(String value) {
   tipopago = value;
+}
+
+optiontipopago(String tipo)
+{
+  tipopago=tipo;
+  if(fecha_pago==null)
+    return;
+  if(tipopago=="Dia")
+    {
+      print("Dia"+  fecha_pago.toString());
+
+
+    }
+  if(tipopago=="Semana")
+    {
+      print("Semana"+  fecha_pago.toString());
+      DateTime fechaven=fecha_pago;
+      fecha_vence=fechaven.add(new Duration(days: 7  ));
+      print(fecha_vence.toString());
+    }
+ if(tipopago=="Quincena")
+    {
+      print("Quincena"+  fecha_pago.toString());
+      DateTime fechaven=fecha_pago;
+      fecha_vence=fechaven.add(new Duration(days: 15  ));
+      print(fecha_vence.toString());
+    }
+  if(tipopago=="Mes")
+    print("Mensual"+  fecha_pago.toString());
+  DateTime fechaven=fecha_pago;
+  fecha_vence=fechaven.add(new Duration(days: 30  ));
+  print(fecha_vence.toString());
+
+
 }
 
 Widget formUI(BuildContext context) {
@@ -93,77 +128,65 @@ Widget formUI(BuildContext context) {
 
           DateTimeField(
           format: format,
-            controller: fechaCtrl,
+            controller:  fechaCtrl,
           decoration: new InputDecoration(
                 labelText: 'Fecha Pago',
                   ) ,
 
           onShowPicker: (context, currentValue)
               {
-
                  return showDatePicker(
                     context: context,
                     firstDate: DateTime(1900),
                     initialDate: currentValue ?? DateTime.now(),
                     lastDate: DateTime(2100));
-                      obtenerfechavencimiento();
+
               },
+            onChanged: (DateTime newValue)
+            {
+              //setvalue_pago(newValue)
+            fecha_pago=newValue;
+            //obtenerfechavencimiento();
+            },
 
         ),
 
 
           ),
+
+
+
+
+
       formItemsDesign(
           null,
           Column(children: <Widget>[
             Text("Forma de Pago"),
-            RadioListTile<String>(
-              title: const Text('Dia'),
-              value: 'dia',
-              groupValue: tipopago,
-              onChanged: (value) {
-                setState(() {
-                  tipopago = value;
-                });
-              },
-            ),
-            RadioListTile<String>(
-              title: const Text('Semanal'),
-              value: 'Semanal',
-              groupValue: tipopago,
-              onChanged: (value) {
-                setState(() {
-                  tipopago = value;
-                });
-              },
-            ),
-            RadioListTile<String>(
-              title: const Text('Quincenal'),
-              value: 'Quincenal',
-              groupValue: tipopago,
-              onChanged: (value) {
-                setState(() {
-                  tipopago = value;
-                });
-              },
-            ),
-            RadioListTile<String>(
-              title: const Text('Mensual'),
-              value: 'Mensual',
-              groupValue: tipopago,
-              onChanged: (value) {
-                setState(() {
-                  tipopago = value;
-                });
-              },
-            )
+
+            RadioButtonGroup(
+                labels: <String>[
+                "Dia",
+                "Semana",
+                  "Quincena",
+                  "Mes",
+                ],
+                onSelected: (String selected) =>
+                  optiontipopago(selected)
+
+
+                  ),
+
           ])),
+
 
       formItemsDesign(
         Icons.date_range,
 
         DateTimeField(
           format: format,
+
+          initialValue: DateTime.now(),
+
           controller: fecha_vencimientoCtrl,
           decoration: new InputDecoration(
             labelText: 'Fecha Vencimiento',
@@ -176,18 +199,30 @@ Widget formUI(BuildContext context) {
                 firstDate: DateTime(1900),
                 initialDate: currentValue ?? DateTime.now(),
                 lastDate: DateTime(2100));
-            obtenerfechavencimiento();
+
           },
+          onChanged: (DateTime newValue)
+          {
+            //setvalue_pago(newValue)
+            fecha_vence=newValue;
+            //obtenerfechavencimiento();
+          },
+
         ),
 
 
       ),
+
+
+
+
 
       GestureDetector(
 
           onTap: () {
             createRecord();
             Navigator.of(context).pop();
+            keyForm.currentState.reset();
 
             //save();
           },
@@ -214,6 +249,27 @@ Widget formUI(BuildContext context) {
     ],
   );
 }
+
+
+Future<Null> seleccionarFecha(BuildContext context) async {
+  DateTime picked;
+
+    picked = await showDatePicker(
+        context: context,
+        initialDate: DateTime.now(),
+        firstDate: DateTime(
+          DateTime.now().year,
+          DateTime.now().month,
+          DateTime.now().day,
+        ),
+        lastDate: DateTime(2101));
+
+  if (picked != null )
+    setState(() {
+     // fechaModificada = picked;
+    });
+}
+
 
 /*
  save() {

@@ -2,19 +2,56 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 
 class Client {
-  final String id;
-  final String nombre;
-  final String apellido;
-  final String direccion;
-  final String telefono;
+   String id;
+   String nombre;
+   String apellido;
+   String direccion;
+   String telefono;
 
-  const Client({
+   Client({
     this.id,
     this.nombre,
     this.apellido,
     this.direccion,
     this.telefono
   });
+  Map<String, dynamic> toMap() {
+    var map = new Map<String, dynamic>();
+    if (this.id != null) {
+      map[''] = this.id;
+    }
+    map['nombre'] = this.nombre;
+    map['apellido'] = this.apellido;
+    map['direccion'] = this.direccion;
+    map['telefono'] = this.telefono;
+
+
+    return map;
+  }
+  String getId() => this.id;
+
+  String getnombre() => this.nombre;
+
+  String getapellido() => this.apellido;
+
+  String getdireccion() => this.direccion;
+
+  String gettelefono() => this.telefono;
+
+   Client.fromMap(Map<String, dynamic> map) {
+
+    this.id = map['id'];
+    this.nombre = map['nombre'];
+    this.apellido = map['apellido'];
+    this.direccion = map['direccion'];
+    this.telefono = map['telefono'];
+
+
+  }
+
+
+
+
 }
 /*
 void loadclientes() {
