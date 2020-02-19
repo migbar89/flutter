@@ -1,121 +1,181 @@
 /*
 
 
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app_gymapp/verinformacion.dart';
+
 import 'datospublicos.dart';
 
-import 'package:material_search/material_search.dart';
+final TextEditingController _searchField = new TextEditingController();
 
-GlobalKey globalKey = new GlobalKey(debugLabel: 'btm_app_bar');
-TextEditingController _searchQueryController = TextEditingController();
-bool _isSearching = false;
-String searchQuery = "Search query";
+bool text_search=false;
 
 void main() => runApp(MyApp());
 
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
+  // This widget is the root of your application.
   @override
-  _MyAppState createState() => _MyAppState();
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Flutter Demo',
+      theme: ThemeData(
+
+        primarySwatch: Colors.pink,
+      ),
+      home: SearchBar(),
+    );
+  }
 }
 
-class _MyAppState extends State<MyApp> {
-
+class SearchBar extends StatefulWidget{
   @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
+  State createState() {
+    // TODO: implement createState
+    return SearchBarState();
+  }
+
+}
+
+class SearchBarState extends State
+{
+  bool issearch=false;
+
+  SearchBarState(){
+    _searchField.addListener((){
+      if(_searchField.text.isNotEmpty)
+      {
+        setState(() {
+          issearch=true;
+          text_search=true;
+
+          // issearch=false;
+
+        });
+      }
+      else
+      {
+        setState(() {
+          text_search=true;
+          // issearch=true;
+        });
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-
-    // burada ise layout u oluştururuz.
     // TODO: implement build
     return MaterialApp(
-        theme: new ThemeData(
-          primarySwatch: Colors.blue,
-        ),
-        home:
-        Scaffold(
+      home: Scaffold(
           appBar: AppBar(
-            leading: _isSearching ? const BackButton() : Container(),
-            title: _isSearching ? _buildSearchField() : _buildTitle(context),
-            actions: _buildActions(),
+            backgroundColor: Colors.pink,
+            title: !issearch? Text("Gym App"):
+            TextField(decoration: InputDecoration(
+              icon: Icon(Icons.search,color: Colors.white),
+              hintText: "Buscando Cliente",
+              hintStyle: TextStyle(color: Colors.white),
+
+
+
+            ),
+              autofocus: true,
+
+              controller: _searchField,
+              style: TextStyle(color: Colors.white),
+            ),
+            actions: <Widget>[
+              this.issearch?
+              IconButton(
+                icon: Icon(Icons.cancel),
+                onPressed: (){
+                  setState(() {
+                    this.issearch=!this.issearch;
+                    text_search=false;
+
+
+                  });
+
+                },
+              ):
+              IconButton(
+                icon: Icon(Icons.search),
+                onPressed: (){
+                  setState(() {
+                    this.issearch=!this.issearch;
+                    text_search=false;
+                  });
+
+                },
+              )
+            ],
+
           ),
-        )
+          body:
+          issearch ? (text_search? busqueda():datoscompletos() ): datoscompletos()
+
+      ),
+    );
+  }
+
+}
+class busqueda extends StatelessWidget {
+
+
+  @override
+  Widget build(BuildContext context) {
+
+    return   StreamBuilder<QuerySnapshot>(
+      stream: Firestore.instance.collection('gym').where('nombre',isGreaterThanOrEqualTo:_searchField.text)
+          .where('nombre',isLessThan: _searchField.text + 'z').snapshots(),
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (snapshot.hasError) return new Text('Error: ${snapshot.error}');
+        switch (snapshot.connectionState) {
+          case ConnectionState.waiting:
+            return new Text('Loading...');
+          default:
+            return new ListView(
+              children:
+              snapshot.data.documents.map((DocumentSnapshot document) {
+                return new Material(
+                    child: _item_listview(document['nombre'],
+                        document['apellido'], document.documentID, context));
+              }).toList(),
+            );
+        }
+      },
     );
   }
 }
-Widget _buildSearchField() {
-  return TextField(
-    controller: _searchQueryController,
-    autofocus: true,
-    decoration: InputDecoration(
-      hintText: "Search Data...",
-      border: InputBorder.none,
-      hintStyle: TextStyle(color: Colors.white30),
-    ),
-    style: TextStyle(color: Colors.white, fontSize: 16.0),
-    onChanged: (query) => updateSearchQuery,
-  );
-}
 
-List<Widget> _buildActions() {
-  if (_isSearching) {
-    return <Widget>[
-      IconButton(
-        icon: const Icon(Icons.clear),
-        onPressed: () {
-          if (_searchQueryController == null ||
-              _searchQueryController.text.isEmpty) {
-            Navigator.pop(context);
-            return;
-          }
-          _clearSearchQuery();
-        },
-      ),
-    ];
+class datoscompletos extends StatelessWidget {
+
+
+  @override
+  Widget build(BuildContext context) {
+    return   StreamBuilder<QuerySnapshot>(
+      stream: Firestore.instance.collection('gym').snapshots(),
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (snapshot.hasError) return new Text('Error: ${snapshot.error}');
+        switch (snapshot.connectionState) {
+          case ConnectionState.waiting:
+            return new Text('Loading...');
+          default:
+            return new ListView(
+              children:
+              snapshot.data.documents.map((DocumentSnapshot document) {
+                return new Material(
+                    child: _item_listview(document['nombre'],
+                        document['apellido'], document.documentID, context));
+              }).toList(),
+            );
+        }
+      },
+    );
   }
-
-  return <Widget>[
-    IconButton(
-      icon: const Icon(Icons.search),
-      onPressed: _startSearch,
-    ),
-  ];
 }
 
-void _startSearch() {
-  ModalRoute.of(context)
-      .addLocalHistoryEntry(LocalHistoryEntry(onRemove: _stopSearching));
-
-  setState(() {
-    _isSearching = true;
-  });
-}
-
-void updateSearchQuery(String newQuery) {
-  setState(() {
-    searchQuery = newQuery;
-  });
-}
-
-void _stopSearching() {
-  _clearSearchQuery();
-
-  setState(() {
-    _isSearching = false;
-  });
-}
-
-void _clearSearchQuery() {
-  setState(() {
-    _searchQueryController.clear();
-    updateSearchQuery("");
-  });
-}
 Widget _item_listview(String nombre, String apellido, String id,
     BuildContext context) {
   return new ListTile(
@@ -138,9 +198,7 @@ Widget _item_listview(String nombre, String apellido, String id,
     },
   );
 }
-
 void _tappedFolder(String which) {
   print(which);
 }
-
 */

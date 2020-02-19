@@ -18,7 +18,7 @@ class Client {
   Map<String, dynamic> toMap() {
     var map = new Map<String, dynamic>();
     if (this.id != null) {
-      map[''] = this.id;
+      map['id'] = this.id;
     }
     map['nombre'] = this.nombre;
     map['apellido'] = this.apellido;
@@ -45,6 +45,7 @@ class Client {
     this.apellido = map['apellido'];
     this.direccion = map['direccion'];
     this.telefono = map['telefono'];
+
 
 
   }
